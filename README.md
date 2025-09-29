@@ -13,7 +13,7 @@ Nuestro objetivo es eliminar la incertidumbre del "boca a boca", ofreciendo un *
 * 👤 **Gestión de Usuarios**: Panel de administración para usuarios, oficios y trabajos.
 * 💬 **Comunicación**: Sistema de chat interno entre usuarios y profesionales.
 * ⭐ **Calificaciones**: Valoraciones verificadas para evaluar la reputación de los profesionales.
-* 💳 **Pagos Seguros**: Integración con **Mercado Pago** para transacciones internas.
+* 💳 **Pagos Seguros**: Integración con **Stripe** para transacciones internas.
 * ☁️ **Almacenamiento en la Nube**: Gestión de archivos y medios con **Cloudinary**.
 * 🔎 **Filtrado Inteligente**: Búsqueda avanzada por oficio, ubicación, disponibilidad y reputación.
 
