@@ -118,41 +118,6 @@ export class ProfessionalController {
     return this.professionalService.getProfessionalByUserId(userId);
   }
 
-  @Post(':userId')
-  @ApiOperation({
-    summary: 'Create a new professional',
-    description: 'Creates a professional profile linked to an existing user.',
-  })
-  @ApiParam({
-    name: 'userId',
-    description:
-      'UUID of the user who will be associated with the professional profile',
-    type: String,
-  })
-  @ApiBody({
-    type: CreateProfessionalDto,
-    description: 'Professional profile data',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Professional successfully created',
-    type: Professional,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'User not found',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid input data',
-  })
-  async createProfessional(
-    @Param('userId') userId: string,
-    @Body() professional: CreateProfessionalDto,
-  ) {
-    return this.professionalService.createProfessional(userId, professional);
-  }
-
   @Put(':id')
   @ApiOperation({
     summary: 'Update a professional profile',

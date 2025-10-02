@@ -49,7 +49,6 @@ export class UserRepository {
     const dbUser = await this.userRepository.findOneBy({ id: newUser.id });
     if (!dbUser) throw new NotFoundException('User not found');
 
-    //Para no mostrar la contraseña del usuario
     const { password, ...filteredData } = dbUser;
     return filteredData;
   }
@@ -85,19 +84,19 @@ export class UserRepository {
       order: { createdAt: 'DESC' },
     });
 
-    // --- LÓGICA CLAVE MEJORADA ---
     let finalStatus = subscription ? subscription.status : 'inactive';
 
     // Si la suscripción está 'active' en nuestra base de datos...
     if (subscription && subscription.status === 'active') {
       // ...le preguntamos a Stripe si está programada para cancelación.
-      const stripeSub = await this.stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+      const stripeSub = await this.stripe.subscriptions.retrieve(
+        subscription.stripeSubscriptionId,
+      );
       if (stripeSub.cancel_at_period_end) {
         // Si lo está, le decimos al frontend que el estado es 'canceled'.
         finalStatus = 'canceled';
       }
     }
-    // --- FIN DE LA LÓGICA ---
 
     const { password, ...userProfile } = user;
     return {
@@ -105,10 +104,6 @@ export class UserRepository {
       subscriptionStatus: finalStatus,
       subscriptionEndsAt: subscription ? subscription.currentPeriodEnd : null,
     };
-  }
-
-  async createUser(user: Partial<User>) {
-    return this.userRepository.save(user);
   }
 
   async updateUser(userId: string, user: UpdateUserDTO) {

@@ -1,4 +1,3 @@
-// upload-img.service.ts
 import {
   BadRequestException,
   Injectable,
@@ -24,7 +23,6 @@ export class UploadImgService {
   ) {}
 
   async uploadProfileImg(file: Express.Multer.File, professionalId: string) {
-    // 🔑 Cargamos también la relación user para sincronizar la foto del usuario
     const professional = await this.professionalRepo.findOne({
       where: { id: professionalId },
       relations: ['user'],
@@ -39,7 +37,6 @@ export class UploadImgService {
       throw new NotFoundException('Could not upload the image');
     }
 
-    // Actualizamos la foto del professional
     await this.professionalRepo
       .createQueryBuilder()
       .update(Professional)
@@ -47,14 +44,12 @@ export class UploadImgService {
       .where('id = :id', { id: professional.id })
       .execute();
 
-    // 🔑 Sincronizamos la foto del usuario asociado
     if (professional.user?.id) {
       await this.userRepo.update(professional.user.id, {
         profileImage: response.secure_url,
       });
     }
 
-    // Devolvemos el objeto actualizado (con la nueva URL)
     return { ...professional, profileImg: response.secure_url };
   }
 
@@ -71,11 +66,9 @@ export class UploadImgService {
     if (!response.secure_url)
       throw new NotFoundException('Could not upload the image');
 
-    // Actualizamos la foto del usuario
     user.profileImage = response.secure_url;
     await this.userRepo.save(user);
 
-    // 🔑 Sincronizamos la del professional asociado (si existe)
     const prof = await this.professionalRepo.findOne({
       where: { user: { id: userId } },
     });
@@ -85,7 +78,6 @@ export class UploadImgService {
       });
     }
 
-    // Devolvemos el user con la nueva imagen
     return user;
   }
 
@@ -105,7 +97,6 @@ export class UploadImgService {
       throw new BadRequestException('Max 3 work images allowed');
     }
 
-    // Subir a Cloudinary
     const response = await this.uploadImgRepository.uploadImage(
       file,
       `professionals/${professional.id}/work`,
@@ -115,7 +106,6 @@ export class UploadImgService {
       throw new BadRequestException('Could not upload the image');
     }
 
-    // Crear nuevo ProfessionalWork
     const workImage = this.professionalWorkRepo.create({
       imgUrl: response.secure_url,
       description: description || '',
@@ -124,7 +114,6 @@ export class UploadImgService {
 
     await this.professionalWorkRepo.save(workImage);
 
-    // Devolver la imagen primero y luego el profesional
     return {
       id: workImage.id,
       imgUrl: workImage.imgUrl,

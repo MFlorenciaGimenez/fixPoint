@@ -5,9 +5,7 @@ import { Readable } from 'stream';
 @Injectable()
 export class UploadImgRepository {
   constructor() {
-    // Usa CLOUDINARY_URL si está; si no, usa las 3 variables separadas
     if (process.env.CLOUDINARY_URL) {
-      // Toma cloud_name, api_key y api_secret de CLOUDINARY_URL
       cloudinary.config({ secure: true });
     } else {
       cloudinary.config({
@@ -20,8 +18,6 @@ export class UploadImgRepository {
 
     const cfg = cloudinary.config();
     if (!cfg.cloud_name || !cfg.api_key || !cfg.api_secret) {
-      // No frenamos la app, pero avisamos en consola
-      // eslint-disable-next-line no-console
       console.warn(
         '[Cloudinary] Faltan credenciales CLOUDINARY_* o CLOUDINARY_URL en .env',
       );
@@ -35,8 +31,8 @@ export class UploadImgRepository {
     return new Promise((resolve, reject) => {
       const upload = cloudinary.uploader.upload_stream(
         {
-          resource_type: 'image', // solo imágenes (tu pipe ya valida mime)
-          folder, // ej: 'professionals/<id>/profile'
+          resource_type: 'image',
+          folder,
           overwrite: true,
           transformation: [{ width: 500, height: 500, crop: 'limit' }],
         },
@@ -47,7 +43,6 @@ export class UploadImgRepository {
         },
       );
 
-      // Subimos desde memoria (usa file.buffer del FileInterceptor)
       Readable.from(file.buffer).pipe(upload);
     });
   }

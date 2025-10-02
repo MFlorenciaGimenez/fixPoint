@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Professional } from './entity/professional.entity';
 import { User } from 'src/users/entities/user.entity';
-import { CreateProfessionalDto } from './dto/createProfessional.dto';
 import { UpdateProfessionalDto } from './dto/updateProfessional.dto';
 
 @Injectable()
@@ -26,7 +25,7 @@ export class ProfessionalRepository {
     const query = this.professionalRepo
       .createQueryBuilder('professional')
       .leftJoinAndSelect('professional.user', 'user')
-      .addSelect(['user.id', 'user.email', 'user.profileImage']) // 🔑 añadido para traer profileImage
+      .addSelect(['user.id', 'user.email', 'user.profileImage'])
       .where('professional.isActive = :isActive', { isActive: true })
       .skip((pageNum - 1) * limitNum)
       .take(limitNum);
@@ -51,7 +50,7 @@ export class ProfessionalRepository {
   async getProfessionalById(id: string) {
     const professionalId = await this.professionalRepo.findOne({
       where: { id },
-      relations: ['user'], // 🔑 simplificado, trae user completo incluido profileImage
+      relations: ['user'],
     });
 
     if (!professionalId) {
@@ -59,27 +58,6 @@ export class ProfessionalRepository {
     }
 
     return professionalId;
-  }
-
-  async createProfessional(
-    userId: string,
-    professional: CreateProfessionalDto,
-  ): Promise<Professional> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['professional'],
-    });
-    if (!user) {
-      throw new NotFoundException('user not found');
-    }
-    if (user.professional) {
-      throw new BadRequestException('User is already a professional');
-    }
-    const newProfessional = this.professionalRepo.create({
-      ...professional,
-      user,
-    });
-    return this.professionalRepo.save(newProfessional);
   }
 
   async updateProfessional(id: string, dto: UpdateProfessionalDto) {
